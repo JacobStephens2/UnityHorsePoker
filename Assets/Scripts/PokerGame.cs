@@ -15,6 +15,10 @@ namespace CardGame
         private TouchButton _btnFold, _btnCall, _btnRaise, _btnDeal;
         private Sprite _face, _back;
 
+        private int _lastHand, _lastStreet, _lastPot;
+        private TableState _lastState;
+        private bool _sfxReady;
+
         private void Start()
         {
             var cam = Camera.main;
@@ -37,12 +41,14 @@ namespace CardGame
             _btnRaise = MakeButton("RAISE", new Vector3(_hW * 0.64f, by, 0), new Color(0.20f, 0.60f, 0.32f), bScale);
             _btnDeal = MakeButton("DEAL", new Vector3(0, by, 0), new Color(0.30f, 0.55f, 0.35f), Mathf.Min(1f, (_hW * 0.8f) / 2.4f));
 
-            _btnFold.Clicked += () => { if (_table.AwaitingHuman) { _table.HumanAct(ActionType.Fold); AfterHuman(); } };
-            _btnCall.Clicked += () => { if (_table.AwaitingHuman) { var v = _table.GetHumanOptions(); _table.HumanAct(v.CanCheck ? ActionType.Check : ActionType.Call); AfterHuman(); } };
-            _btnRaise.Clicked += () => { if (_table.AwaitingHuman) { var v = _table.GetHumanOptions(); _table.HumanAct(v.CanRaise ? ActionType.Raise : (v.CanCheck ? ActionType.Check : ActionType.Call)); AfterHuman(); } };
-            _btnDeal.Clicked += () => { if (_table.State == TableState.HandOver) { _table.StartHand(); _timer = 0; Render(); } };
+            _btnFold.Clicked += () => { if (_table.AwaitingHuman) { Sfx.Fold(); _table.HumanAct(ActionType.Fold); AfterHuman(); } };
+            _btnCall.Clicked += () => { if (_table.AwaitingHuman) { Sfx.Click(); var v = _table.GetHumanOptions(); _table.HumanAct(v.CanCheck ? ActionType.Check : ActionType.Call); AfterHuman(); } };
+            _btnRaise.Clicked += () => { if (_table.AwaitingHuman) { Sfx.Click(); var v = _table.GetHumanOptions(); _table.HumanAct(v.CanRaise ? ActionType.Raise : (v.CanCheck ? ActionType.Check : ActionType.Call)); AfterHuman(); } };
+            _btnDeal.Clicked += () => { if (_table.State == TableState.HandOver) { Sfx.Click(); _table.StartHand(); _timer = 0; Render(); } };
 
-            _table = new HorseTable(4);
+            Sfx.Init(gameObject);
+            _table = new HorseTable(3); // You + 2 AI opponents
+            _lastHand = 0; _lastStreet = 0; _lastPot = 0; _lastState = TableState.HandOver; _sfxReady = true;
             _table.StartHand();
             Render();
         }
@@ -108,10 +114,14 @@ namespace CardGame
 
             bool over = _table.State == TableState.HandOver;
 
-            // Opponents across the top.
-            float[] ox = { -_hW * 0.64f, 0f, _hW * 0.64f };
-            for (int seat = 1; seat <= 3 && seat < _table.Players.Length; seat++)
-                DrawSeat(seat, new Vector3(ox[seat - 1], _hH - 2.4f, 0), 0.40f, true);
+            // Opponents across the top, evenly spread for whatever the count is.
+            int nOpp = _table.Players.Length - 1;
+            for (int k = 0; k < nOpp; k++)
+            {
+                int seat = k + 1;
+                float x = nOpp == 1 ? 0f : Mathf.Lerp(-_hW * 0.6f, _hW * 0.6f, k / (float)(nOpp - 1));
+                DrawSeat(seat, new Vector3(x, _hH - 2.4f, 0), 0.42f, true);
+            }
 
             // Community board.
             if (VariantInfo.IsCommunity(v) && _table.Board.Count > 0)
@@ -129,6 +139,19 @@ namespace CardGame
             else _msgLabel.text = _table.Players[_table.ToActSeat].Name + " to act";
 
             UpdateButtons();
+            FireSfx();
+        }
+
+        private void FireSfx()
+        {
+            if (!_sfxReady) return;
+            if (_table.HandNo != _lastHand || (_table.Street != _lastStreet && _table.State != TableState.HandOver)) Sfx.Deal();
+            if (_table.Pot > _lastPot) Sfx.Chip();
+            if (_table.State == TableState.HandOver && _lastState != TableState.HandOver) Sfx.Win();
+            _lastHand = _table.HandNo;
+            _lastStreet = _table.Street;
+            _lastPot = _table.Pot;
+            _lastState = _table.State;
         }
 
         private void DrawSeat(int seat, Vector3 center, float cardScale, bool compact)

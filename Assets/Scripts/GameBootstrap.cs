@@ -22,6 +22,7 @@ namespace CardGame
             camGo.clearFlags = CameraClearFlags.SolidColor;
             camGo.backgroundColor = new Color(0.10f, 0.27f, 0.20f); // card-table green
 
+            gameObject.AddComponent<MusicPlayer>();
             gameObject.AddComponent<PokerGame>();
         }
     }
