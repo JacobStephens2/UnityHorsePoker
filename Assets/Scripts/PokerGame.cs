@@ -47,7 +47,7 @@ namespace CardGame
             _btnDeal.Clicked += () => { if (_table.State == TableState.HandOver) { Sfx.Click(); _table.StartHand(); _timer = 0; Render(); } };
 
             Sfx.Init(gameObject);
-            _table = new HorseTable(3); // You + 2 AI opponents
+            _table = new HorseTable(4); // You + 3 AI opponents
             _lastHand = 0; _lastStreet = 0; _lastPot = 0; _lastState = TableState.HandOver; _sfxReady = true;
             _table.StartHand();
             Render();
