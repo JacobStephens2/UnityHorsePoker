@@ -41,7 +41,7 @@ namespace CardGame.EditorTools
         private static void ConfigurePlayer()
         {
             PlayerSettings.companyName = "Vagabond";
-            PlayerSettings.productName = "HORSE Poker";
+            PlayerSettings.productName = "Unreal HORSE";
             PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, AppId);
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel23;
