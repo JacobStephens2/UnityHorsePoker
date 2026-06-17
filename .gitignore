@@ -57,3 +57,7 @@ crashlytics-build.properties
 
 # Unity Android IL2CPP/Gradle build cache
 .utmp/
+
+# MCP debug screenshots
+Assets/Screenshots/
+Assets/Screenshots.meta

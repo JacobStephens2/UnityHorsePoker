@@ -20,9 +20,9 @@ namespace CardGame
             camGo.orthographicSize = 5.5f;
             camGo.transform.position = new Vector3(0f, 0f, -10f);
             camGo.clearFlags = CameraClearFlags.SolidColor;
-            camGo.backgroundColor = new Color(0.12f, 0.30f, 0.22f); // card-table green
+            camGo.backgroundColor = new Color(0.10f, 0.27f, 0.20f); // card-table green
 
-            gameObject.AddComponent<GameController>();
+            gameObject.AddComponent<PokerGame>();
         }
     }
 }

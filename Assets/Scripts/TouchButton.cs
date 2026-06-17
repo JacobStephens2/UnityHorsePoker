@@ -10,6 +10,7 @@ namespace CardGame
 
         private SpriteRenderer _bg;
         private Color _normal;
+        private TextMesh _label;
 
         public void Init(string label, Color color, float width = 2.4f, float height = 1.1f)
         {
@@ -22,8 +23,16 @@ namespace CardGame
             var col = gameObject.AddComponent<BoxCollider2D>();
             col.size = new Vector2(width, height);
 
-            TextFactory.Create("Label", transform, new Vector3(0f, 0f, -0.1f), 50, Color.white);
-            GetComponentInChildren<TextMesh>().text = label;
+            _label = TextFactory.Create("Label", transform, new Vector3(0f, 0f, -0.1f), 50, Color.white);
+            _label.text = label;
+        }
+
+        public void SetLabel(string s) { if (_label != null) _label.text = s; }
+
+        public void SetColor(Color color)
+        {
+            _normal = color;
+            if (_bg != null) _bg.sprite = SpriteFactory.RoundedRect(240, 110, 28, color, color * 0.8f, 6);
         }
 
         public void Press()

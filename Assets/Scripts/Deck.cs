@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace CardGame
 {
-    // A standard 52-card deck with Fisher-Yates shuffle. Reshuffles when exhausted.
+    // A standard 52-card deck (ranks 2..14) with Fisher-Yates shuffle.
     public class Deck
     {
         private readonly List<Card> _cards = new List<Card>(52);
@@ -12,19 +12,18 @@ namespace CardGame
         public Deck(int seed = 0)
         {
             _rng = seed == 0 ? new System.Random() : new System.Random(seed);
-            Build();
-            Shuffle();
+            Reset();
         }
 
         public int Remaining => _cards.Count - _index;
 
-        private void Build()
+        public void Reset()
         {
             _cards.Clear();
             for (int s = 0; s < 4; s++)
-                for (int r = 1; r <= 13; r++)
+                for (int r = 2; r <= 14; r++)
                     _cards.Add(new Card(r, (Suit)s));
-            _index = 0;
+            Shuffle();
         }
 
         public void Shuffle()
@@ -37,11 +36,6 @@ namespace CardGame
             _index = 0;
         }
 
-        public Card Draw()
-        {
-            if (Remaining <= 0)
-                Shuffle();
-            return _cards[_index++];
-        }
+        public Card Deal() => _cards[_index++];
     }
 }
