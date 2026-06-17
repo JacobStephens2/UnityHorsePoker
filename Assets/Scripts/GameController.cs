@@ -28,26 +28,40 @@ namespace CardGame
 
         private void BuildField()
         {
-            // Card in the centre-top.
+            // Lay everything out relative to the camera's real world bounds so it fits
+            // any aspect ratio (wide editor Game view AND tall phone screens).
+            var cam = Camera.main;
+            float halfH = cam.orthographicSize;
+            float halfW = halfH * cam.aspect;
+
+            // Card centred, in the upper third.
             var cardGo = new GameObject("Card");
-            cardGo.transform.position = new Vector3(0f, 1.4f, 0f);
+            cardGo.transform.position = new Vector3(0f, halfH * 0.30f, 0f);
             _cardView = cardGo.AddComponent<CardView>();
             _cardView.Init();
 
-            // Buttons along the bottom.
-            _lower = MakeButton("LowerButton", "LOWER", new Vector3(-1.6f, -2.6f, 0f), new Color(0.20f, 0.45f, 0.85f));
-            _higher = MakeButton("HigherButton", "HIGHER", new Vector3(1.6f, -2.6f, 0f), new Color(0.20f, 0.65f, 0.35f));
+            // Buttons along the bottom — width and X are derived from the screen so they
+            // never run off the edges on a narrow portrait device.
+            const float nativeBtnW = 2.4f;
+            float btnW = Mathf.Min(nativeBtnW, halfW * 0.88f);
+            float btnScale = btnW / nativeBtnW;
+            float btnX = halfW - btnW * 0.5f - halfW * 0.04f;
+            float btnY = -halfH + 1.4f;
+
+            _lower = MakeButton("LowerButton", "LOWER", new Vector3(-btnX, btnY, 0f), new Color(0.20f, 0.45f, 0.85f), btnScale);
+            _higher = MakeButton("HigherButton", "HIGHER", new Vector3(btnX, btnY, 0f), new Color(0.20f, 0.65f, 0.35f), btnScale);
             _lower.Clicked += () => Guess(false);
             _higher.Clicked += () => Guess(true);
 
-            _scoreText = TextFactory.Create("Score", null, new Vector3(0f, 3.9f, 0f), 50, Color.white);
-            _resultText = TextFactory.Create("Result", null, new Vector3(0f, -1.0f, 0f), 40, new Color(0.9f, 0.9f, 0.6f));
+            _scoreText = TextFactory.Create("Score", null, new Vector3(0f, halfH - 0.8f, 0f), 50, Color.white);
+            _resultText = TextFactory.Create("Result", null, new Vector3(0f, -halfH * 0.18f, 0f), 40, new Color(0.9f, 0.9f, 0.6f));
         }
 
-        private TouchButton MakeButton(string name, string label, Vector3 pos, Color color)
+        private TouchButton MakeButton(string name, string label, Vector3 pos, Color color, float scale)
         {
             var go = new GameObject(name);
             go.transform.position = pos;
+            go.transform.localScale = new Vector3(scale, scale, 1f);
             var btn = go.AddComponent<TouchButton>();
             btn.Init(label, color);
             return btn;

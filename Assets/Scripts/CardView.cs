@@ -15,8 +15,8 @@ namespace CardGame
             _bg.sprite = SpriteFactory.RoundedRect(200, 280, 24, Color.white, new Color(0.85f, 0.85f, 0.88f));
             _bg.sortingOrder = 0;
 
-            _topLabel = TextFactory.Create("TopLabel", transform, new Vector3(-0.72f, 1.05f, 0f), 60, Color.black, TextAnchor.UpperLeft);
-            _centerLabel = TextFactory.Create("CenterLabel", transform, new Vector3(0f, 0f, 0f), 130, Color.black);
+            _topLabel = TextFactory.Create("TopLabel", transform, new Vector3(-0.82f, 1.22f, 0f), 44, Color.black, TextAnchor.UpperLeft);
+            _centerLabel = TextFactory.Create("CenterLabel", transform, new Vector3(0f, -0.15f, 0f), 95, Color.black);
         }
 
         public void Show(Card card)
